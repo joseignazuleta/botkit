@@ -81,15 +81,23 @@ var os = require('os');
 var commandLineArgs = require('command-line-args');
 var localtunnel = require('localtunnel');
 
-const ops = commandLineArgs([
-      {name: 'lt', alias: 'l', args: 1, description: 'Use localtunnel.me to make your bot available on the web.',
-      type: Boolean, defaultValue: false},
-      {name: 'ltsubdomain', alias: 's', args: 1,
-      description: 'Custom subdomain for the localtunnel.me URL. This option can only be used together with --lt.',
-      type: String, defaultValue: null},
-   ]);
+const ops = commandLineArgs([{
+    name: 'lt',
+    alias: 'l',
+    args: 1,
+    description: 'Use localtunnel.me to make your bot available on the web.',
+    type: Boolean,
+    defaultValue: false
+}, {
+    name: 'ltsubdomain',
+    alias: 's',
+    args: 1,
+    description: 'Custom subdomain for the localtunnel.me URL. This option can only be used together with --lt.',
+    type: String,
+    defaultValue: null
+}, ]);
 
-if(ops.lt === false && ops.ltsubdomain !== null) {
+if (ops.lt === false && ops.ltsubdomain !== null) {
     console.log("error: --ltsubdomain can only be used together with --lt.");
     process.exit();
 }
@@ -100,14 +108,16 @@ var controller = Botkit.facebookbot({
     verify_token: process.env.verify_token,
 });
 
-var bot = controller.spawn({
-});
+var bot = controller.spawn({});
 
 controller.setupWebserver(process.env.port || 3000, function(err, webserver) {
     controller.createWebhookEndpoints(webserver, bot, function() {
         console.log('ONLINE!');
-        if(ops.lt) {
-            var tunnel = localtunnel(process.env.port || 3000, {subdomain: ops.ltsubdomain}, function(err, tunnel) {
+        if (ops.lt) {
+            console.log('**** USING LOCAL TUNNEL');
+            var tunnel = localtunnel(process.env.port || 3000, {
+                subdomain: ops.ltsubdomain
+            }, function(err, tunnel) {
                 if (err) {
                     console.log(err);
                     process.exit();
@@ -143,52 +153,41 @@ controller.hears(['structured'], 'message_received', function(bot, message) {
                 'type': 'template',
                 'payload': {
                     'template_type': 'generic',
-                    'elements': [
-                        {
-                            'title': 'Classic White T-Shirt',
-                            'image_url': 'http://petersapparel.parseapp.com/img/item100-thumb.png',
-                            'subtitle': 'Soft white cotton t-shirt is back in style',
-                            'buttons': [
-                                {
-                                    'type': 'web_url',
-                                    'url': 'https://petersapparel.parseapp.com/view_item?item_id=100',
-                                    'title': 'View Item'
-                                },
-                                {
-                                    'type': 'web_url',
-                                    'url': 'https://petersapparel.parseapp.com/buy_item?item_id=100',
-                                    'title': 'Buy Item'
-                                },
-                                {
-                                    'type': 'postback',
-                                    'title': 'Bookmark Item',
-                                    'payload': 'White T-Shirt'
-                                }
-                            ]
-                        },
-                        {
-                            'title': 'Classic Grey T-Shirt',
-                            'image_url': 'http://petersapparel.parseapp.com/img/item101-thumb.png',
-                            'subtitle': 'Soft gray cotton t-shirt is back in style',
-                            'buttons': [
-                                {
-                                    'type': 'web_url',
-                                    'url': 'https://petersapparel.parseapp.com/view_item?item_id=101',
-                                    'title': 'View Item'
-                                },
-                                {
-                                    'type': 'web_url',
-                                    'url': 'https://petersapparel.parseapp.com/buy_item?item_id=101',
-                                    'title': 'Buy Item'
-                                },
-                                {
-                                    'type': 'postback',
-                                    'title': 'Bookmark Item',
-                                    'payload': 'Grey T-Shirt'
-                                }
-                            ]
-                        }
-                    ]
+                    'elements': [{
+                        'title': 'Classic White T-Shirt',
+                        'image_url': 'http://petersapparel.parseapp.com/img/item100-thumb.png',
+                        'subtitle': 'Soft white cotton t-shirt is back in style',
+                        'buttons': [{
+                            'type': 'web_url',
+                            'url': 'https://petersapparel.parseapp.com/view_item?item_id=100',
+                            'title': 'View Item'
+                        }, {
+                            'type': 'web_url',
+                            'url': 'https://petersapparel.parseapp.com/buy_item?item_id=100',
+                            'title': 'Buy Item'
+                        }, {
+                            'type': 'postback',
+                            'title': 'Bookmark Item',
+                            'payload': 'White T-Shirt'
+                        }]
+                    }, {
+                        'title': 'Classic Grey T-Shirt',
+                        'image_url': 'http://petersapparel.parseapp.com/img/item101-thumb.png',
+                        'subtitle': 'Soft gray cotton t-shirt is back in style',
+                        'buttons': [{
+                            'type': 'web_url',
+                            'url': 'https://petersapparel.parseapp.com/view_item?item_id=101',
+                            'title': 'View Item'
+                        }, {
+                            'type': 'web_url',
+                            'url': 'https://petersapparel.parseapp.com/buy_item?item_id=101',
+                            'title': 'Buy Item'
+                        }, {
+                            'type': 'postback',
+                            'title': 'Bookmark Item',
+                            'payload': 'Grey T-Shirt'
+                        }]
+                    }]
                 }
             }
         }, function(response, convo) {
@@ -229,34 +228,32 @@ controller.hears(['what is my name', 'who am i'], 'message_received', function(b
                 if (!err) {
                     convo.say('I do not know your name yet!');
                     convo.ask('What should I call you?', function(response, convo) {
-                        convo.ask('You want me to call you `' + response.text + '`?', [
-                            {
-                                pattern: 'yes',
-                                callback: function(response, convo) {
-                                    // since no further messages are queued after this,
-                                    // the conversation will end naturally with status == 'completed'
-                                    convo.next();
-                                }
-                            },
-                            {
-                                pattern: 'no',
-                                callback: function(response, convo) {
-                                    // stop the conversation. this will cause it to end with status == 'stopped'
-                                    convo.stop();
-                                }
-                            },
-                            {
-                                default: true,
-                                callback: function(response, convo) {
-                                    convo.repeat();
-                                    convo.next();
-                                }
+                        convo.ask('You want me to call you `' + response.text + '`?', [{
+                            pattern: 'yes',
+                            callback: function(response, convo) {
+                                // since no further messages are queued after this,
+                                // the conversation will end naturally with status == 'completed'
+                                convo.next();
                             }
-                        ]);
+                        }, {
+                            pattern: 'no',
+                            callback: function(response, convo) {
+                                // stop the conversation. this will cause it to end with status == 'stopped'
+                                convo.stop();
+                            }
+                        }, {
+                            default: true,
+                            callback: function(response, convo) {
+                                convo.repeat();
+                                convo.next();
+                            }
+                        }]);
 
                         convo.next();
 
-                    }, {'key': 'nickname'}); // store the results in a field called nickname
+                    }, {
+                        'key': 'nickname'
+                    }); // store the results in a field called nickname
 
                     convo.on('end', function(convo) {
                         if (convo.status == 'completed') {
@@ -291,26 +288,23 @@ controller.hears(['shutdown'], 'message_received', function(bot, message) {
 
     bot.startConversation(message, function(err, convo) {
 
-        convo.ask('Are you sure you want me to shutdown?', [
-            {
-                pattern: bot.utterances.yes,
-                callback: function(response, convo) {
-                    convo.say('Bye!');
-                    convo.next();
-                    setTimeout(function() {
-                        process.exit();
-                    }, 3000);
-                }
-            },
-        {
+        convo.ask('Are you sure you want me to shutdown?', [{
+            pattern: bot.utterances.yes,
+            callback: function(response, convo) {
+                convo.say('Bye!');
+                convo.next();
+                setTimeout(function() {
+                    process.exit();
+                }, 3000);
+            }
+        }, {
             pattern: bot.utterances.no,
             default: true,
             callback: function(response, convo) {
                 convo.say('*Phew!*');
                 convo.next();
             }
-        }
-        ]);
+        }]);
     });
 });
 
