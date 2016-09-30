@@ -113,8 +113,7 @@ var bot = controller.spawn({});
 controller.setupWebserver(process.env.port || 3000, function(err, webserver) {
     controller.createWebhookEndpoints(webserver, bot, function() {
         console.log('ONLINE!');
-        console.log(bot);
-        console.log(webserver);
+
         if (ops.lt) {
             console.log('**** USING LOCAL TUNNEL');
             var tunnel = localtunnel(process.env.port || 3000, {
